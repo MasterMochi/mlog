@@ -1,0 +1,6 @@
+build/obj/*
+build/libmlog
+build/mlog
+release/mlog
+release/libmlog.a
+tags
