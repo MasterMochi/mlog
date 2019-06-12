@@ -1,7 +1,7 @@
 /******************************************************************************/
 /*                                                                            */
 /* src/libmlog/Put.c                                                          */
-/*                                                                 2019/04/21 */
+/*                                                                 2019/06/12 */
 /* Copyright (C) 2019 Mochi.                                                  */
 /*                                                                            */
 /******************************************************************************/
@@ -95,7 +95,7 @@ static void DoPut( char    *pFormat,
     /* 初期化 */
     errNo             = MK_TASKNAME_ERR_NONE;
     retry             = 0;
-    taskId            = MK_CONFIG_TASKID_NULL;
+    taskId            = MK_TASKID_NULL;
     msg.header.funcId = MLOG_FUNCID_PUT;
 
     memset( msg.str, 0, MLOG_STR_LENMAX + 1 );
