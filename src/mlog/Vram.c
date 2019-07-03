@@ -113,19 +113,19 @@ void VramWriteChar( uint8_t attr,
     } else {
         /* その他 */
 
-        /* VRAM書込み */
-        VRAM( gRow, gColumn, OFFSET_CHAR ) = ( uint8_t ) c;
-        VRAM( gRow, gColumn, OFFSET_ATTR ) = attr;
-
-        /* カーソル更新 */
-        gColumn++;
-
         /* 改行判定 */
         if ( gColumn >= VGA_M3_COLUMN ) {
             /* 改行 */
 
             doLinefeed();
         }
+
+        /* VRAM書込み */
+        VRAM( gRow, gColumn, OFFSET_CHAR ) = ( uint8_t ) c;
+        VRAM( gRow, gColumn, OFFSET_ATTR ) = attr;
+
+        /* カーソル更新 */
+        gColumn++;
     }
 
     return;
@@ -173,6 +173,7 @@ void VramWriteStr( uint8_t attr,
 /******************************************************************************/
 static void doLinefeed( void )
 {
+    uint32_t row;       /* 行 */
     uint32_t column;    /* 列 */
 
     /* 列初期化 */
@@ -188,10 +189,12 @@ static void doLinefeed( void )
         /* 最下行カーソル設定 */
         gRow = VGA_M3_ROW - 1;
 
-        /* スクロール */
-        memcpy( &( VRAM( 0, 0, OFFSET_CHAR ) ),
-                &( VRAM( 1, 0, OFFSET_CHAR ) ),
-                ( VGA_M3_ROW - 1 ) * VGA_M3_COLUMN * 2 );
+        /* 2行目から一行毎に繰り返す*/
+        for ( row = 1; row < VGA_M3_ROW; row++ ) {
+            memcpy( &( VRAM( row - 1, 0, OFFSET_CHAR ) ),
+                    &( VRAM( row    , 0, OFFSET_CHAR ) ),
+                    VGA_M3_COLUMN * 2                     );
+        }
 
         /* 最下行初期化 */
         for ( column = 0; column < VGA_M3_COLUMN; column++ ) {
