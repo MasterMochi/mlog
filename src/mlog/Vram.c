@@ -1,7 +1,7 @@
 /******************************************************************************/
 /*                                                                            */
 /* src/mlog/Vram.c                                                            */
-/*                                                                 2019/04/06 */
+/*                                                                 2019/07/28 */
 /* Copyright (C) 2019 Mochi.                                                  */
 /*                                                                            */
 /******************************************************************************/
@@ -13,7 +13,7 @@
 #include <string.h>
 
 /* ライブラリヘッダ */
-#include <libMk.h>
+#include <libmk.h>
 
 /* モジュールヘッダ */
 #include "vga.h"
@@ -63,15 +63,15 @@ static uint32_t gColumn = 0;
 /******************************************************************************/
 void VramInit( void )
 {
-    uint32_t errNo;     /* エラー番号 */
+    MkErr_t  err;       /* エラー内容 */
     uint32_t row;       /* カーソル行 */
     uint32_t column;    /* カーソル列 */
 
     /* 初期化 */
-    errNo = MK_IOMEM_ERR_NONE;
+    err = MK_ERR_NONE;
 
     /* VRAM領域割当 */
-    pgVram = MkIoMemAlloc( ( void * ) 0x000B8000, 0x00008000, &errNo );
+    LibMkIoMemAlloc( ( void * ) 0x000B8000, 0x00008000, &pgVram, &err );
 
     /* 割当て結果判定 */
     if ( pgVram == NULL ) {

@@ -1,7 +1,7 @@
 /******************************************************************************/
 /*                                                                            */
 /* src/mlog/main.c                                                            */
-/*                                                                 2019/06/12 */
+/*                                                                 2019/07/28 */
 /* Copyright (C) 2019 Mochi.                                                  */
 /*                                                                            */
 /******************************************************************************/
@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 /* ライブラリヘッダ */
-#include <libMk.h>
+#include <libmk.h>
 
 /* 共通ヘッダ */
 #include <mlog.h>
@@ -57,24 +57,24 @@ static Func_t gFuncTbl[ MLOG_FUNCID_NUM ] =
 /******************************************************************************/
 void main( void )
 {
-    int32_t  ret;   /* カーネル戻り値 */
-    uint32_t errNo; /* エラー番号     */
+    MkRet_t ret;    /* カーネル戻り値 */
+    MkErr_t err;    /* エラー内容     */
 
     /* 初期化 */
-    errNo = MK_TASKNAME_ERR_NONE;
+    err = MK_ERR_NONE;
 
     /* VRAMモジュール初期化 */
     VramInit();
 
     /* タスク名登録 */
-    ret = MkTaskNameRegister( "LOG", &errNo );
+    ret = LibMkTaskNameRegister( "LOG", &err );
 
     /* 登録結果判定 */
-    if ( ret != MK_TASKNAME_RET_SUCCESS ) {
+    if ( ret != MK_RET_SUCCESS ) {
         /* 失敗 */
 
         /* TODO: アボート */
-        VramWriteStr( VRAM_DEFAULT_ATTR, "MkTaskNameRegister() error." );
+        VramWriteStr( VRAM_DEFAULT_ATTR, "LibMkTaskNameRegister() error." );
     }
 
     /* メインループ */
@@ -95,8 +95,9 @@ void main( void )
 /******************************************************************************/
 static void Loop( void )
 {
-    int32_t      size;      /* メッセージサイズ   */
-    uint32_t     errNo;     /* エラー番号         */
+    size_t       size;      /* メッセージサイズ   */
+    MkRet_t      ret;       /* 戻り値             */
+    MkErr_t      err;       /* エラー内容         */
     MkTaskId_t   srcTaskId; /* 送信元タスクID     */
     MlogMsgHdr_t *pMsgHdr;  /* メッセージバッファ */
 
@@ -123,18 +124,19 @@ static void Loop( void )
     /* メインループ */
     while ( true ) {
         /* 初期化 */
-        errNo     = MK_MSG_ERR_NONE;
+        err       = MK_ERR_NONE;
         srcTaskId = MK_TASKID_NULL;
 
         /* メッセージ受信 */
-        size = MkMsgReceive( MK_TASKID_NULL,        /* 受信タスクID   */
-                             pMsgHdr,               /* バッファ       */
-                             MK_MSG_SIZE_MAX,       /* バッファサイズ */
-                             &srcTaskId,            /* 送信元タスクID */
-                             &errNo           );    /* エラー番号     */
+        ret = LibMkMsgReceive( MK_TASKID_NULL,        /* 受信タスクID   */
+                               pMsgHdr,               /* バッファ       */
+                               MK_MSG_SIZE_MAX,       /* バッファサイズ */
+                               &srcTaskId,            /* 送信元タスクID */
+                               &size,                 /* 受信サイズ     */
+                               &err             );    /* エラー番号     */
 
         /* 受信結果判定 */
-        if ( size == MK_MSG_RET_FAILURE ) {
+        if ( ret != MK_RET_SUCCESS ) {
             /* 失敗 */
 
             continue;

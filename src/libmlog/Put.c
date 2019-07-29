@@ -1,7 +1,7 @@
 /******************************************************************************/
 /*                                                                            */
 /* src/libmlog/Put.c                                                          */
-/*                                                                 2019/06/12 */
+/*                                                                 2019/07/28 */
 /* Copyright (C) 2019 Mochi.                                                  */
 /*                                                                            */
 /******************************************************************************/
@@ -16,7 +16,7 @@
 #include <string.h>
 
 /* ライブラリヘッダ */
-#include <libMk.h>
+#include <libmk.h>
 #include <libmlog.h>
 
 /* 共通ヘッダ */
@@ -86,14 +86,14 @@ void LibMlogPut( char *pFormat,
 static void DoPut( char    *pFormat,
                    va_list vaList    )
 {
-    int32_t      ret;       /* 関数戻り値       */
-    uint32_t     errNo;     /* エラー番号       */
+    MkRet_t      ret;       /* 関数戻り値       */
+    MkErr_t      err;       /* エラー内容       */
     uint32_t     retry;     /* リトライカウンタ */
     MkTaskId_t   taskId;    /* タスクID         */
     MlogMsgPut_t msg;       /* メッセージ       */
 
     /* 初期化 */
-    errNo             = MK_TASKNAME_ERR_NONE;
+    err               = MK_ERR_NONE;
     retry             = 0;
     taskId            = MK_TASKID_NULL;
     msg.header.funcId = MLOG_FUNCID_PUT;
@@ -103,22 +103,22 @@ static void DoPut( char    *pFormat,
     /* リトライ上限まで繰り返す */
     do {
         /* タスクID取得 */
-        ret = MkTaskNameGet( "LOG", &taskId, &errNo );
+        ret = LibMkTaskNameGet( "LOG", &taskId, &err );
 
         /* 取得結果判定 */
-        if ( ret == MK_TASKNAME_RET_SUCCESS ) {
+        if ( ret == MK_RET_SUCCESS ) {
             /* 成功 */
 
             break;
         }
 
         /* リトライ判定 */
-        if ( ( errNo == MK_TASKNAME_ERR_NOREGISTERED ) &&
-             ( retry <= RETRY_MAX                    )    ) {
+        if ( ( err   == MK_ERR_NO_REGISTERED ) &&
+             ( retry <= RETRY_MAX            )    ) {
             /* リトライ要 */
 
             /* ビジーウェイト */
-            MkTimerSleep( RETRY_WAIT, NULL );
+            LibMkTimerSleep( RETRY_WAIT, NULL );
             /* リトライ回数更新 */
             retry++;
             /* リトライ */
@@ -136,7 +136,7 @@ static void DoPut( char    *pFormat,
     vsnprintf( msg.str, MLOG_STR_LENMAX, pFormat, vaList );
 
     /* メッセージ送信 */
-    MkMsgSend( taskId, &msg, sizeof ( MlogMsgPut_t ), NULL );
+    LibMkMsgSend( taskId, &msg, sizeof ( MlogMsgPut_t ), NULL );
 
     return;
 }
