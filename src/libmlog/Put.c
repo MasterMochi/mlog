@@ -1,7 +1,7 @@
 /******************************************************************************/
 /*                                                                            */
 /* src/libmlog/Put.c                                                          */
-/*                                                                 2019/07/28 */
+/*                                                                 2019/11/20 */
 /* Copyright (C) 2019 Mochi.                                                  */
 /*                                                                            */
 /******************************************************************************/
@@ -136,7 +136,7 @@ static void DoPut( char    *pFormat,
     vsnprintf( msg.str, MLOG_STR_LENMAX, pFormat, vaList );
 
     /* メッセージ送信 */
-    LibMkMsgSend( taskId, &msg, sizeof ( MlogMsgPut_t ), NULL );
+    LibMkMsgSendNB( taskId, &msg, sizeof ( MlogMsgPut_t ), NULL );
 
     return;
 }
