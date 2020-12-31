@@ -47,6 +47,7 @@ endif
 # ライブラリ
 LIBS  = -lc
 LIBS += -lMLib
+LIBS += -lc
 LIBS += -lmk
 
 
